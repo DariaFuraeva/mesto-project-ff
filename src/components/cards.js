@@ -1,7 +1,3 @@
-import { handleClickCard } from "../scripts/index";
-//import {handleLikeCard} from "../scripts/index";
-// import {handleLikeCard} from "../../src/scripts/index.js"
-// const placesList = document.querySelector('.page .content .places');
 const cardTemplate = document.querySelector('#card-template').content;
 //const cardTitle = document.querySelector('.card__description .card__title');
 
