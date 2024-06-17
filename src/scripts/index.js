@@ -1,7 +1,8 @@
 import {initialCards, /*handleClickCard*/ } from './cards.js';
 import {createCard} from '../components/cards.js'
 import {openModal, closeModal, closeByEscape/*closeModalByEsc*/} from '../components/modal.js';
-
+import {enableValidation, showInputError, hideInputError, checkInputValidity, setEventListeners, hasInvalidInput, toggleButtonState} from '../components/validation.js';
+import { getUserData } from '../components/api.js';
 const modalImage = document.querySelector('.popup_type_image');
 const cardImage = document.querySelector('.popup_type_image .popup__content .popup__image');
 const cardImageCaption = document.querySelector('.popup_type_image .popup__content .popup__caption');
@@ -22,6 +23,25 @@ const cardUrlInput = document.querySelector('.popup__input_type_url');
 // Элементы, куда должны быть вставлены значения полей
 const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
+
+// Элемент формы для редактирования профиля
+// const profileEditform = document.forms.edit-profile;
+
+// const nameError = profileEditform.querySelector(`.${nameInput.id}-error`);
+// const jobError = profileEditform.querySelector(`.${jobInput.id}-error`);
+
+getUserData().then((data) => {
+  console.log(data);
+})
+getUserData().then((data) => {
+  profileTitle.textContent = data.name;
+
+})
+
+
+
+
+
 
 
 // Обработчик «отправки» формы редактирования профиля (имя, занятие)
@@ -54,13 +74,23 @@ function handleFormCreateCard(evt) {
   cardUrlInput.value = '';
 }
 
-// Отображение шести картчоек при открытии страницы
-initialCards.forEach(function(item){
-  //const name = item.name;
-  //const link = item.link;
-  const newCard = createCard(item, handleClickCard, handleLikeCard);
-  placesList.append(newCard);
-})
+
+// getInitialCards();
+// console.log(example);
+// newInitialCards.forEach(function(item){
+//     //const name = item.name;
+//     //const link = item.link;
+//     const newCard = createCard(item, handleClickCard, handleLikeCard);
+//     placesList.append(newCard);
+//   })
+
+// Отображение шести карточек при открытии страницы
+// initialCards.forEach(function(item){
+//   //const name = item.name;
+//   //const link = item.link;
+//   const newCard = createCard(item, handleClickCard, handleLikeCard);
+//   placesList.append(newCard);
+// })
 
 editButton.addEventListener('click', function(){
   openModal(popupEditWindow)
@@ -77,9 +107,6 @@ popupsModal.forEach((popup) => {
       closeModal(popup)
     }
   });
-  //document.addEventListener('keydown', closeByEscape)
-  //closeModalByEsc(popup);
- // document.addEventListener('keydown', closeModalByEsc(popup));
 });
 
 // Прикрепляем обработчик к форме: он будет следить за событием “submit” - «отправка»
@@ -100,6 +127,17 @@ export function handleClickCard(item, title) {
   openModal(modalImage);
 }
 
+// Функция, которая отвечает за включение валидации всех форм.
+// Она принимает все нужные функциям классы
+// и селекторы элементов как объект настроек.
+enableValidation({
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible'
+});
 
 
 

@@ -16,6 +16,7 @@
 
 .popup__button:hover {
   background: rgba(0, 0, 0, 0.8);
+  color:  white;
   cursor: pointer;
 }
 
@@ -25,3 +26,12 @@
     line-height: 17px;
   }
 }
+
+.button_inactive, .button_inactive:hover {
+  cursor: default;
+  color:  rgba(0, 0, 0, 0.15);
+  background: rgb(255, 255, 255);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+

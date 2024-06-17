@@ -1,5 +1,6 @@
 import './pages/index.css'; // добавьте импорт главного файла стилей
 import './scripts/index.js';
+import './components/api.js'
 console.log('Hello, World!')
 
 
