@@ -85,6 +85,7 @@ export function toggleButtonState(inputList, buttonElement) {
 }
 
 // Функция, которая очищает ошибки валидации формы и делает кнопку неактивной
-export function clearValidation() {
+export function clearValidation(form, validationConfig) {
+  const modal = form.querySelector('.popup__input');
 
 }

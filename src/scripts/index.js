@@ -2,7 +2,7 @@ import {initialCards, /*handleClickCard*/ } from './cards.js';
 import {createCard} from '../components/cards.js'
 import {openModal, closeModal, closeByEscape/*closeModalByEsc*/} from '../components/modal.js';
 import {enableValidation, showInputError, hideInputError, checkInputValidity, setEventListeners, hasInvalidInput, toggleButtonState} from '../components/validation.js';
-import { getUserData } from '../components/api.js';
+import {getUserData, getInitialCards, editProfile, addCard} from '../components/api.js';
 const modalImage = document.querySelector('.popup_type_image');
 const cardImage = document.querySelector('.popup_type_image .popup__content .popup__image');
 const cardImageCaption = document.querySelector('.popup_type_image .popup__content .popup__caption');
@@ -23,34 +23,69 @@ const cardUrlInput = document.querySelector('.popup__input_type_url');
 // Элементы, куда должны быть вставлены значения полей
 const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
+const profileImage = document.querySelector('.profile__image');
 
-// Элемент формы для редактирования профиля
-// const profileEditform = document.forms.edit-profile;
+// // Загрузка данных о пользователе с сервера
+// getUserData().then((data) => {
+//   // console.log('Это имя пользователя с сервера: ', data.name);
+//   console.log('Это данные о пользовтаеле с сервера: ', data);
+//   // console.log('Ссылка на аватар', data.avatar);
+// })
 
-// const nameError = profileEditform.querySelector(`.${nameInput.id}-error`);
-// const jobError = profileEditform.querySelector(`.${jobInput.id}-error`);
-
-getUserData().then((data) => {
-  console.log(data);
+Promise.all([getUserData(), getInitialCards()])
+.then(([userData, cardsArr]) => {
+  profileTitle.textContent = userData.name;
+  profileDescription.textContent = userData.about;
+  profileImage.setAttribute('style', `background-image: url(${userData.avatar})`);
+  cardsArr.forEach(function(item) {
+    const newCard = createCard(item, handleClickCard, handleLikeCard);
+    // console.log(item.name);
+    // console.log(item.link);
+    // console.log('Количество лайков карточки: ', item.likes.length);
+    placesList.append(newCard);
+    const cardLikeCounter = newCard.querySelector('.card__like-counter');
+    cardLikeCounter.textContent = item.likes.length;
+  })
 })
-getUserData().then((data) => {
-  profileTitle.textContent = data.name;
 
-})
+// getUserData().then((data) => {
+//   profileTitle.textContent = data.name;
+//   profileDescription.textContent = data.about;
+//   profileImage.setAttribute('style', `background-image: url(${data.avatar})`);
+// })
 
+// // Загрузка карточек с сервера
+// getInitialCards().then((cardsArr) => {
+//   console.log('Это список карточек', cardsArr);
+//   cardsArr.forEach(function(item) {
+//     const newCard = createCard(item, handleClickCard, handleLikeCard);
+//     // console.log(item.name);
+//     // console.log(item.link);
+//     // console.log('Количество лайков карточки: ', item.likes.length);
+//     placesList.append(newCard);
+//     const cardLikeCounter = newCard.querySelector('.card__like-counter');
+//     cardLikeCounter.textContent = item.likes.length;
+//   })
+// })
 
-
-
-
-
+// // Добавление новой карточки
+// addCard().then((card) => {
+//   // console.log('Это новая карточка', card);
+//   const newCard = createCard(card, handleClickCard, handleLikeCard);
+//   placesList.prepend(newCard);
+// })
 
 // Обработчик «отправки» формы редактирования профиля (имя, занятие)
 function handleFormSubmit(evt) {
   evt.preventDefault(); // Эта строчка отменяет стандартную отправку формы.
 
+  const user = {name: '', about: '', avatar: ''};
   // Значения полей jobInput и nameInput из свойства value
-  nameInput.value;
-  jobInput.value;
+  user.name = nameInput.value;
+  user.about = jobInput.value;
+
+  // Обновление данных профиля
+  editProfile(user);
 
   // Вставка новых значений с помощью textContent
   profileTitle.textContent = nameInput.value;
@@ -62,29 +97,25 @@ function handleFormSubmit(evt) {
 // Обработчик «отправки» формы добавления карточки (название, ссылка)
 function handleFormCreateCard(evt) {
   evt.preventDefault();
-  const item = {name: 'gbg' , link: 'https://www.google.com/imgres?q=%D0%BA%D0%BE%D1%82&imgurl=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2F0%2F0e%2FFelis_silvestris_silvestris.jpg&imgrefurl=https%3A%2F%2Fru.wikipedia.org%2Fwiki%2F%25D0%259B%25D0%25B5%25D1%2581%25D0%25BD%25D0%25BE%25D0%25B9_%25D0%25BA%25D0%25BE%25D1%2582&docid=Rm7BJO6MTjUm8M&tbnid=NEO8sL4d0dLmPM&vet=12ahUKEwis3LiW0O-FAxVHMRAIHaBEA-cQM3oECBkQAA..i&w=1496&h=1729&hcb=2&ved=2ahUKEwis3LiW0O-FAxVHMRAIHaBEA-cQM3oECBkQAA'};
+  const item = {name: '' , link: ''};
   item.name = cardNameInput.value;
   item.link = cardUrlInput.value;
-  console.log(item);
+
+  // Добавление новой карточки
+  addCard(item);
   const newCard = createCard(item, handleClickCard, handleLikeCard);
+  console.log(item["owner"]);
   placesList.prepend(newCard);
+
+
   const modalIsOpened = document.querySelector('.popup_is-opened');
   closeModal(modalIsOpened);
   cardNameInput.value = '';
   cardUrlInput.value = '';
+
 }
 
-
-// getInitialCards();
-// console.log(example);
-// newInitialCards.forEach(function(item){
-//     //const name = item.name;
-//     //const link = item.link;
-//     const newCard = createCard(item, handleClickCard, handleLikeCard);
-//     placesList.append(newCard);
-//   })
-
-// Отображение шести карточек при открытии страницы
+// Отображение шести карточек при открытии страницы (Использовалось при выполнении ПР5, ПР6)
 // initialCards.forEach(function(item){
 //   //const name = item.name;
 //   //const link = item.link;
@@ -138,12 +169,6 @@ enableValidation({
   inputErrorClass: 'popup__input_type_error',
   errorClass: 'popup__error_visible'
 });
-
-
-
-
-
-
 
 
 

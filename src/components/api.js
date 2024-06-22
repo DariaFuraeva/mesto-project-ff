@@ -1,6 +1,6 @@
-
+// GET-запрос для получения данных о пользователе
 export function getUserData() {
-  fetch('https://nomoreparties.co/v1/wff-cohort-16/users/me', {
+  return fetch('https://nomoreparties.co/v1/wff-cohort-16/users/me', {
     headers: {
       authorization: '03a967f6-55ee-4e4e-b7f8-c5d21e5db7dc'
     }
@@ -12,19 +12,9 @@ export function getUserData() {
     });
 }
 
-
-
-
-
-
-
-
-
-
-
 // GET-запрос для подгрузки начальных карточек с сервера
 export function getInitialCards() {
-  fetch('https://nomoreparties.co/v1/wff-cohort-16/cards', {
+  return fetch('https://nomoreparties.co/v1/wff-cohort-16/cards', {
     headers: {
       authorization: '03a967f6-55ee-4e4e-b7f8-c5d21e5db7dc'
     }
@@ -32,40 +22,62 @@ export function getInitialCards() {
     .then((res) => {
       return res.json();
     })
+}
 
-    .then((result) => {
-      console.log(result);
+// PATCH-запрос для редактирования данных профиля
+export function editProfile(data) {
+  return fetch('https://nomoreparties.co/v1/wff-cohort-16/users/me', {
+    method: 'PATCH',
+    headers: {
+      authorization: '03a967f6-55ee-4e4e-b7f8-c5d21e5db7dc',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: data.name,
+      about: data.about
     })
 
+  });
+}
 
+// POST-запрос для добавлени новой карточки
+export function addCard(data) {
+  return fetch('https://nomoreparties.co/v1/wff-cohort-16/cards', {
+    method: 'POST',
+    headers: {
+      authorization: '03a967f6-55ee-4e4e-b7f8-c5d21e5db7dc',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: data.name,
+      about: data.about,
+      link: data.link
+    })
+  })
+  // .then((data) => {
+  //   console.log(data)
+  // })
+}
 
-    // .then((result) => {
-    //   newArray = result;
-    // })
+// DELETE-запрос для удаления карточки
+export function deleteCardfromServer(card) {
+  return fetch(`https://nomoreparties.co/v1/wff-cohort-16/cards/${card._id}`, {
+    method: 'DELETE',
+    headers: {
+      authorization: '03a967f6-55ee-4e4e-b7f8-c5d21e5db7dc',
+      'Content-Type': 'application/json'
+    },
 
-    // .then((res) => {
+  });
+}
 
-    //     res.forEach(function(item){
-    //       //const name = item.name;
-    //       //const link = item.link;
-    //       const newCard = createCard(item, handleClickCard, handleLikeCard);
-    //       placesList.append(newCard);
-    //     })
-
-    // })
-
-
-    .catch((err) => {
-      console.log('Ошибка. Запрос не выполнен: ', err);
-    });
-
-
-
+// PUT-запрос для лайка/дизлайка карточки
+export function likeCard(card) {
+  return fetch(`https://nomoreparties.co/v1/cohortId/cards/likes/${card._id}`), {
+    method: 'PUT',
+    headers: {
+      authorization: '03a967f6-55ee-4e4e-b7f8-c5d21e5db7dc',
+      'Content-Type': 'application/json'
+    },
   }
-
-  //console.log(getInitialCards());
-
-  const example = getInitialCards();
-  console.log('А вот и результат', example);
-
-
+}

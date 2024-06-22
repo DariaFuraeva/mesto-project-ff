@@ -17,7 +17,7 @@
     <section class="profile page__section">
       <div class="profile__image" style="background-image: url(<%=require('./images/avatar.jpg')%>);"></div>
       <div class="profile__info">
-        <h1 class="profile__title"></h1>
+        <h1 class="profile__title">Жак-Ив Кусто</h1>
         <button class="profile__edit-button" type="button"></button>
         <p class="profile__description">Исследователь океана</p>
       </div>
@@ -113,7 +113,11 @@
     <div class="card__description">
       <h2 class="card__title">
       </h2>
-      <button type="button" class="card__like-button"></button>
+      <div class="card__like-container">
+        <button type="button" class="card__like-button"></button>
+        <div class="card__like-counter">0</div>
+      </div>
+
     </div>
   </li>
 </template>
