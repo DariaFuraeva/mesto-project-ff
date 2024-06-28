@@ -1,11 +1,13 @@
-import { deleteCardfromServer } from "./api";
+import { deleteCardfromServer, likeCard } from "./api";
 const cardTemplate = document.querySelector('#card-template').content;
 //const cardTitle = document.querySelector('.card__description .card__title');
 
 // Функция удаления карточки
 export function deleteCard(cardItem) {
+  // deleteCardfromServer(cardItem);
+  // console.log(cardItem);
   cardItem.remove();
-  deleteCardfromServer(cardItem);
+
 }
 
 // deleteCard(cardId).then((card) => {
@@ -24,19 +26,40 @@ export function createCard(item, handleClickCard, handleLikeCard) {
   cardTitle.textContent = item.name;
 
   const deleteButton = cardElement.querySelector('.card__delete-button');
-  deleteButton.addEventListener('click', () => deleteCard(cardElement));
+  // const myId = '9ba15da7537acf3e06b7d4bc';
+  // console.log(item.owner._id, 'Автор карточки');
+  // if (!(item.owner._id === myId)) {
+  //   // deleteButton.setAttribute('disabled', '');
+  //   deleteButton.classList.add('hidden');
+  // };
+
+  deleteButton.addEventListener('click', () => {
+    deleteCardfromServer(item)
+    .then(() => deleteCard(cardElement))
+
+  });
+
+
   cardImage.addEventListener('click', () => handleClickCard(cardImage, cardTitle.textContent));
 
   const cardLikeButton = cardElement.querySelector('.card__like-button');
-  cardLikeButton.addEventListener('click', () => handleLikeCard(cardLikeButton));
-  // console.log(item._id, ' Это id пользователя');
+  cardLikeButton.addEventListener('click', () => {
+    handleLikeCard(cardLikeButton);
+    // likeCard(item);
+  });
 
-  // const myId = '9ba15da7537acf3e06b7d4bc';
-  // console.log('id автора карточки: ', item.owner_id)
-  // if (!(item.owner_id === myId)) {
-  //     // deleteButton.setAttribute('disabled', '');
-  //     deleteButton.classList.add('hidden');
-  // };
+//  Отображение количества лайков
+  // const cardLikeCounter = cardElement.querySelector('.card__like-counter');
+  // // console.log(cardLikeCounter.textContent);
+  // cardLikeCounter.textContent = item.likes.length;
+
+  //console.log(item.likes.length, 'Кто лайкнул');
+
+
+  // console.log(item);
+
+  // console.log('id карточки: ', item._id)
+
   return cardElement;
 };
 

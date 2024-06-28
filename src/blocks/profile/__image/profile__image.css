@@ -9,6 +9,45 @@
   margin: 0 29px 0 0;
 }
 
+.profile__image-container:hover .profile__image{
+  animation: fade 1s linear forwards;
+  cursor: pointer;
+}
+
+.profile__image-edit {
+  width: 26px;
+  height: 26px;
+  position: absolute;
+  z-index: 2;
+  inset: 47px;
+  /*display: none;*/
+  background: transparent url('/./src/images/edit-icon.svg') center no-repeat;
+}
+
+.profile__image-container:hover .profile__image_edit-button {
+  display: block;
+  cursor: pointer;
+
+}
+
+
+/* .profile__image-container:hover .profile__image-edit {
+  display: block;
+  cursor: pointer;
+} */
+
+.profile__image-container {
+  position: relative;
+}
+@keyframes fade {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+
 @media screen and (max-width: 740px) {
   .profile__image {
     margin: 0 10px 0 0;

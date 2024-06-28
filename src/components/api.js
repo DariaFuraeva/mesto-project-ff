@@ -54,9 +54,6 @@ export function addCard(data) {
       link: data.link
     })
   })
-  // .then((data) => {
-  //   console.log(data)
-  // })
 }
 
 // DELETE-запрос для удаления карточки
@@ -66,18 +63,50 @@ export function deleteCardfromServer(card) {
     headers: {
       authorization: '03a967f6-55ee-4e4e-b7f8-c5d21e5db7dc',
       'Content-Type': 'application/json'
-    },
-
-  });
+    }
+  })
+  // .then((res) => {
+  //   return res.json();
+  // })
 }
 
-// PUT-запрос для лайка/дизлайка карточки
+// PUT-запрос для добавления лайка карточки
 export function likeCard(card) {
-  return fetch(`https://nomoreparties.co/v1/cohortId/cards/likes/${card._id}`), {
+  return fetch(`https://nomoreparties.co/v1/wff-cohort-16/cards/likes/${card._id}`, {
     method: 'PUT',
     headers: {
       authorization: '03a967f6-55ee-4e4e-b7f8-c5d21e5db7dc',
       'Content-Type': 'application/json'
     },
+    body: JSON.stringify({
+      likes: card.likes,
+      _id: card._id
+    })
+  }
+  // .then((res) => consile.log(res));
+)}
+
+// DELETE-запрос для удаления лайка карточки
+export function deleteLikeCard(card) {
+  return fetch(`https://nomoreparties.co/v1/wff-cohort-16/cards/likes/${card._id}`), {
+    method: 'DELETE',
+    headers: {
+      authorization: '03a967f6-55ee-4e4e-b7f8-c5d21e5db7dc',
+    }
   }
 }
+
+// // PATCH-запрос для обновления аватара пользователя
+// export function editProfile(data) {
+//   return fetch('https://nomoreparties.co/v1/cohortId/users/me/avatar', {
+//     method: 'PATCH',
+//     headers: {
+//       authorization: '03a967f6-55ee-4e4e-b7f8-c5d21e5db7dc',
+//       'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify({
+//       avatar: ''
+//     })
+
+//   });
+// }

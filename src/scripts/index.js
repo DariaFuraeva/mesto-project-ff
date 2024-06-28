@@ -2,7 +2,7 @@ import {initialCards, /*handleClickCard*/ } from './cards.js';
 import {createCard} from '../components/cards.js'
 import {openModal, closeModal, closeByEscape/*closeModalByEsc*/} from '../components/modal.js';
 import {enableValidation, showInputError, hideInputError, checkInputValidity, setEventListeners, hasInvalidInput, toggleButtonState} from '../components/validation.js';
-import {getUserData, getInitialCards, editProfile, addCard} from '../components/api.js';
+import {getUserData, getInitialCards, editProfile, addCard, likeCard} from '../components/api.js';
 const modalImage = document.querySelector('.popup_type_image');
 const cardImage = document.querySelector('.popup_type_image .popup__content .popup__image');
 const cardImageCaption = document.querySelector('.popup_type_image .popup__content .popup__caption');
@@ -39,12 +39,21 @@ Promise.all([getUserData(), getInitialCards()])
   profileImage.setAttribute('style', `background-image: url(${userData.avatar})`);
   cardsArr.forEach(function(item) {
     const newCard = createCard(item, handleClickCard, handleLikeCard);
-    // console.log(item.name);
+    //console.log(item);
     // console.log(item.link);
     // console.log('Количество лайков карточки: ', item.likes.length);
     placesList.append(newCard);
     const cardLikeCounter = newCard.querySelector('.card__like-counter');
     cardLikeCounter.textContent = item.likes.length;
+
+
+    const deleteButton = newCard.querySelector('.card__delete-button');
+    const myId = '9ba15da7537acf3e06b7d4bc';
+    console.log(item.owner._id, 'Автор карточки');
+    if (!(item.owner._id === myId)) {
+      // deleteButton.setAttribute('disabled', '');
+      deleteButton.classList.add('hidden');
+    };
   })
 })
 
@@ -102,17 +111,17 @@ function handleFormCreateCard(evt) {
   item.link = cardUrlInput.value;
 
   // Добавление новой карточки
-  addCard(item);
-  const newCard = createCard(item, handleClickCard, handleLikeCard);
-  console.log(item["owner"]);
-  placesList.prepend(newCard);
-
+  // const newCard = createCard(item, handleClickCard, handleLikeCard);
+  addCard(item)
+  .then((data) => {
+    const newCard = createCard(data, handleClickCard, handleLikeCard);
+    placesList.prepend(newCard);
+  });
 
   const modalIsOpened = document.querySelector('.popup_is-opened');
   closeModal(modalIsOpened);
   cardNameInput.value = '';
   cardUrlInput.value = '';
-
 }
 
 // Отображение шести карточек при открытии страницы (Использовалось при выполнении ПР5, ПР6)
@@ -146,8 +155,10 @@ formElement.addEventListener('submit', handleFormSubmit);
 createCardFormElement.addEventListener('submit', handleFormCreateCard);
 
 // Функция обработки клика по кнопке лайка
-export function handleLikeCard(button) {
+export function handleLikeCard(button, card) {
   button.classList.toggle('card__like-button_is-active');
+  //console.log(card);
+  // likeCard(card);
 }
 
 // Функция обработки клика по карточке (открытие изображения в модальном окне)
