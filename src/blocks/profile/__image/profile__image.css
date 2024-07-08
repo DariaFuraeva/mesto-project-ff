@@ -20,21 +20,14 @@
   position: absolute;
   z-index: 2;
   inset: 47px;
-  /*display: none;*/
-  background: transparent url('/./src/images/edit-icon.svg') center no-repeat;
+  display: none;
 }
 
-.profile__image-container:hover .profile__image_edit-button {
+.profile__image-container:hover .profile__image-edit {
   display: block;
   cursor: pointer;
 
 }
-
-
-/* .profile__image-container:hover .profile__image-edit {
-  display: block;
-  cursor: pointer;
-} */
 
 .profile__image-container {
   position: relative;

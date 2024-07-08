@@ -17,8 +17,7 @@
     <section class="profile page__section">
       <div class="profile__image-container">
         <div class="profile__image" style="background-image: url(<%=require('./images/avatar.jpg')%>);"></div>
-        <button class="profile__image_edit-button"></button>
-        <!--<img src="<%=require('./images/edit-icon.svg')%>" alt="Иконка редактирования аватара" class="profile__image-edit">-->
+        <img src="<%=require('./images/edit-icon.svg')%>" alt="Иконка редактирования аватара" class="profile__image-edit">
       </div>
       <div class="profile__info">
         <h1 class="profile__title">Жак-Ив Кусто</h1>
@@ -119,7 +118,7 @@
         placeholder="Ссылка на изображение"
         required
         id="avatar-url_input">
-          <span class="popup__input_type_url-error card-url_input-error" ></span>
+        <span class="popup__input_type_url-error avatar-url_input-error"></span>
         <button type="submit" class="button popup__button">Сохранить</button>
       </form>
     </div>
