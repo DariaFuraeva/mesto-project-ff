@@ -1,8 +1,9 @@
 import {initialCards, /*handleClickCard*/ } from './cards.js';
 import {createCard} from '../components/cards.js'
-import {openModal, closeModal, closeByEscape/*closeModalByEsc*/} from '../components/modal.js';
-import {enableValidation, showInputError, hideInputError, checkInputValidity, setEventListeners, hasInvalidInput, toggleButtonState} from '../components/validation.js';
+import {openModal, closeModal} from '../components/modal.js';
+import {enableValidation, showInputError, hideInputError, checkInputValidity, setEventListeners, hasInvalidInput, toggleButtonState, clearValidation} from '../components/validation.js';
 import {getUserData, getInitialCards, editProfile, addCard, likeCard, editProfileImage, deleteLikeCard} from '../components/api.js';
+import {handleLikeCard} from '../components/cards.js'
 
 const modalImage = document.querySelector('.popup_type_image');
 const cardImage = document.querySelector('.popup_type_image .popup__content .popup__image');
@@ -28,6 +29,7 @@ const profileImageEdit = document.querySelector('.profile__image-edit');
 const popupProfileImage = document.querySelector('.popup_type_edit-avatar');
 const profileImageUrlInput = document.querySelector('.popup_type_edit-avatar .popup__content .popup__form .popup__input_type_url');
 const editProfileImageFormElement = document.querySelector('.popup_type_edit-avatar .popup__content .popup__form');
+let userId;
 
 // // Загрузка данных о пользователе с сервера
 // getUserData().then((data) => {
@@ -42,23 +44,18 @@ Promise.all([getUserData(), getInitialCards()])
   profileDescription.textContent = userData.about;
   profileImage.setAttribute('style', `background-image: url(${userData.avatar})`);
   cardsArr.forEach(function(item) {
-    const newCard = createCard(item, handleClickCard, handleLikeCard);
-    //console.log(item);
-    // console.log(item.link);
-    // console.log('Количество лайков карточки: ', item.likes.length);
+    userId = userData._id;
+    const newCard = createCard(item, handleClickCard, handleLikeCard, userId);
+
     placesList.append(newCard);
-    // const cardLikeCounter = newCard.querySelector('.card__like-counter');
-    // cardLikeCounter.textContent = item.likes.length;
 
     const deleteButton = newCard.querySelector('.card__delete-button');
-    const myId = '9ba15da7537acf3e06b7d4bc';
-    // console.log(item.owner._id, 'Автор карточки');
-    if (!(item.owner._id === myId)) {
-      // deleteButton.setAttribute('disabled', '');
-      deleteButton.classList.add('hidden');
-    };
+    // userId = userData._id;
   })
 })
+.catch((err) => {
+  console.log('Ошибка. Запрос не выполнен: ', err);
+});
 
 // getUserData().then((data) => {
 //   profileTitle.textContent = data.name;
@@ -93,18 +90,22 @@ function handleFormEditProfileImage(evt) {
   const item = {avatar: ''};
   item.avatar = profileImageUrlInput.value;
   renderLoading(true);
+  const modalIsOpened = document.querySelector('.popup_is-opened');
 
   editProfileImage(item)
   // .then((res) => console.log(res.avatar))
   .then((data) => {
     profileImage.setAttribute('style', `background-image: url(${data.avatar})`)
   })
+  .then(() => {
+    closeModal(modalIsOpened);
+  })
   .finally(() => {
     renderLoading(false);
   })
-
-  const modalIsOpened = document.querySelector('.popup_is-opened');
-  closeModal(modalIsOpened);
+  .catch((err) => {
+    console.log('Ошибка. Запрос не выполнен: ', err);
+  });
 }
 
 // Обработчик «отправки» формы редактирования профиля (имя, занятие)
@@ -117,17 +118,23 @@ function handleFormSubmit(evt) {
   user.about = jobInput.value;
 
   renderLoading(true);
+  const modalIsOpened = document.querySelector('.popup_is-opened');
   // Обновление данных профиля
   editProfile(user)
+  .then(() => {
+    // Вставка новых значений с помощью textContent
+    profileTitle.textContent = nameInput.value;
+    profileDescription.textContent = jobInput.value;
+  })
+  .then(() => {
+    closeModal(modalIsOpened);
+  })
   .finally(() => {
     renderLoading(false);
   })
-
-  // Вставка новых значений с помощью textContent
-  profileTitle.textContent = nameInput.value;
-  profileDescription.textContent = jobInput.value;
-  const modalIsOpened = document.querySelector('.popup_is-opened');
-  closeModal(modalIsOpened)
+  .catch((err) => {
+    console.log('Ошибка. Запрос не выполнен: ', err);
+  });
 }
 
 // Обработчик «отправки» формы добавления карточки (название, ссылка)
@@ -138,20 +145,34 @@ function handleFormCreateCard(evt) {
   item.link = cardUrlInput.value;
 
   renderLoading(true);
+  const modalIsOpened = document.querySelector('.popup_is-opened');
+  const saveButton = modalIsOpened.querySelector('.popup__button');
   // Добавление новой карточки
   addCard(item)
   .then((data) => {
     const newCard = createCard(data, handleClickCard, handleLikeCard);
     placesList.prepend(newCard);
   })
+  .then(() => {
+    closeModal(modalIsOpened);
+  })
+  .then(() => {
+    // Очистка инпутов формы карточки после закрытия модального окна
+    cardNameInput.value = '';
+    cardUrlInput.value = '';
+
+    // Делаем кнопку сохранения неактивной
+    // (Иначе, форма открывается после успешного сабмита
+    // с пустыми значениями в полях и с активной кнопкой сабмита)
+    saveButton.classList.add('button_inactive');
+    saveButton.setAttribute('disabled', '');
+  })
   .finally(() => {
     renderLoading(false);
   })
-
-  const modalIsOpened = document.querySelector('.popup_is-opened');
-  closeModal(modalIsOpened);
-  cardNameInput.value = '';
-  cardUrlInput.value = '';
+  .catch((err) => {
+    console.log('Ошибка. Запрос не выполнен: ', err);
+  });
 }
 
 // Функция, отображающая надпись "Сохранение..." на кнопке сохранения, пока идёт загрузка
@@ -174,18 +195,24 @@ function renderLoading(isLoading) {
 
 // Обработчик нажатия на кнопку редактирования аватара профиля
 profileImageEdit.addEventListener('click', function() {
+  const profileImageEditForm = popupProfileImage.querySelector('.popup__form')
+  clearValidation(profileImageEditForm, validationConfig);
   openModal(popupProfileImage);
 })
 
 // Обработчик нажатия на кнопку редактирования имени и описания профиля
 editButton.addEventListener('click', function(){
+  const profileEditForm = popupEditWindow.querySelector('.popup__form')
+  clearValidation(profileEditForm, validationConfig);
   openModal(popupEditWindow);
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileDescription.textContent;
 });
 
-// Обработчик нажатия на кнопку реддобавления карточки
+// Обработчик нажатия на кнопку добавления карточки
 profileAddButton.addEventListener('click', function(){
+  const newCardForm = popupNewCard.querySelector('.popup__form')
+  clearValidation(newCardForm, validationConfig);
   openModal(popupNewCard)});
 
 popupsModal.forEach((popup) => {
@@ -203,34 +230,6 @@ createCardFormElement.addEventListener('submit', handleFormCreateCard);
 
 editProfileImageFormElement.addEventListener('submit', handleFormEditProfileImage);
 
-
-
-// Функция обработки клика по кнопке лайка
-export function handleLikeCard(button, flag, counter, item) {
-  button.classList.toggle('card__like-button_is-active');
-
-  // Навешиваем флаг в зависимости от того, лайкнута МНОЙ карточка или нет
-  if (button.classList.contains('card__like-button_is-active')) {
-    flag = false;
-  } else {
-    flag = true;
-  }
-
-  // В зависимости от значения флага либо добавляем лайк, либо удаляем
-  if (flag === false) {
-    console.log('лАЙКАЕМ!');
-    likeCard(item)
-    .then((data) => {
-      counter.textContent = data.likes.length;
-    })
-  } else {
-    deleteLikeCard(item)
-    .then((data) => {
-      counter.textContent = data.likes.length;
-    })
-  }
-}
-
 // Функция обработки клика по карточке (открытие изображения в модальном окне)
 export function handleClickCard(item, title) {
   cardImage.src = item.src;
@@ -242,14 +241,16 @@ export function handleClickCard(item, title) {
 // Функция, которая отвечает за включение валидации всех форм.
 // Она принимает все нужные функциям классы
 // и селекторы элементов как объект настроек.
-enableValidation({
+export const validationConfig = ({
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
   submitButtonSelector: '.popup__button',
-  inactiveButtonClass: 'popup__button_disabled',
-  inputErrorClass: 'popup__input_type_error',
-  errorClass: 'popup__error_visible'
+  inactiveButtonClass: 'button_inactive',
+  inputErrorClass: 'form__input_type_error',
+  errorClass: 'form__input-error_active'
 });
+
+enableValidation(validationConfig);
 
 // @todo: Темплейт карточки
 

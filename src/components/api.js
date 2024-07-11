@@ -1,6 +1,15 @@
 const myToken = '03a967f6-55ee-4e4e-b7f8-c5d21e5db7dc';
 const serverAdress = 'https://nomoreparties.co/v1/wff-cohort-16/';
 
+// Функция проверки успешности запроса
+function handleResponse(res) {
+  if (res.ok) {
+    return res.json();
+  }
+  // если ошибка, отклоняем промис
+  return Promise.reject(`Ошибка: ${res.status}`);
+}
+
 // GET-запрос для получения данных о пользователе
 export function getUserData() {
   return fetch(`${serverAdress}users/me`, {
@@ -8,18 +17,7 @@ export function getUserData() {
       authorization: myToken
     }
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-
-    // если ошибка, отклоняем промис
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-
-  .catch((err) => {
-    console.log('Ошибка. Запрос не выполнен: ', err);
-  });
+  .then(handleResponse)
 }
 
 // GET-запрос для подгрузки начальных карточек с сервера
@@ -29,18 +27,7 @@ export function getInitialCards() {
       authorization: myToken
     }
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-
-    // если ошибка, отклоняем промис
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-
-  .catch((err) => {
-    console.log('Ошибка. Запрос не выполнен: ', err);
-  });
+  .then(handleResponse)
 }
 
 // PATCH-запрос для редактирования данных профиля
@@ -72,18 +59,7 @@ export function addCard(data) {
       link: data.link
     })
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-
-    // если ошибка, отклоняем промис
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-
-  .catch((err) => {
-    console.log('Ошибка. Запрос не выполнен: ', err);
-  });
+  .then(handleResponse)
 }
 
 // DELETE-запрос для удаления карточки
@@ -114,18 +90,7 @@ export function likeCard(card) {
     })
   }
 )
-  .then(res => {
-      if (res.ok) {
-        return res.json();
-      }
-
-      // если ошибка, отклоняем промис
-      return Promise.reject(`Ошибка: ${res.status}`);
-    })
-
-    .catch((err) => {
-      console.log('Ошибка. Запрос не выполнен: ', err);
-    });
+    .then(handleResponse)
 }
 
 // DELETE-запрос для удаления лайка карточки
@@ -140,18 +105,7 @@ export function deleteLikeCard(card) {
       _id: card._id
     })
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-
-    // если ошибка, отклоняем промис
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-
-  .catch((err) => {
-    console.log('Ошибка. Запрос не выполнен: ', err);
-  });
+  .then(handleResponse)
 }
 
 // PATCH-запрос для обновления аватара пользователя
@@ -166,16 +120,5 @@ export function editProfileImage(data) {
       avatar: data.avatar
     })
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-
-    // если ошибка, отклоняем промис
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-
-  .catch((err) => {
-    console.log('Ошибка. Запрос не выполнен: ', err);
-  });
+  .then(handleResponse)
 }
