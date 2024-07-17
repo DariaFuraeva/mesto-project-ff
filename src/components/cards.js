@@ -20,11 +20,10 @@ export function createCard(item, handleClickCard, handleLikeCard, userId) {
   const deleteButton = cardElement.querySelector('.card__delete-button');
 
   // console.log(item.owner._id, 'Автор карточки');
-  userId = item.owner._id;
   // При создании карточки проверяем, кто её автор. Если я, то скрываем кнопку удаления
   if (!(item.owner._id === userId)) {
-    // deleteButton.setAttribute('disabled', '');
     deleteButton.classList.add('hidden');
+    console.log('Эта карточка создана не мной.  id автора: ', item.owner._id);
   };
 
   deleteButton.addEventListener('click', () => {
@@ -47,31 +46,31 @@ export function createCard(item, handleClickCard, handleLikeCard, userId) {
     return user._id === userId
   })) {
     cardLikeButton.classList.add('card__like-button_is-active');
-    console.log('Есть мой лайк!');
+    // console.log('Есть мой лайк!');
   }
 
   // Если карточка уже была лайкнута мной, навешиваем флаг
-  const isLikedCard = cardLikeButton.classList.contains('card__like-button_is-active');
+  // const isLikedCard = cardLikeButton.classList.contains('card__like-button_is-active');
 
   // Навешиваем слушатель клика по кнопке лайка
   cardLikeButton.addEventListener('click', () => {
-    handleLikeCard(cardLikeButton, isLikedCard, cardLikeCounter, item);
+    handleLikeCard(cardLikeButton, cardLikeCounter, item);
   })
 
   return cardElement;
 };
 
 // Функция обработки клика по кнопке лайка
-export function handleLikeCard(button, isLikedCard, counter, item) {
-  button.classList.toggle('card__like-button_is-active');
+export function handleLikeCard(button, counter, item) {
 
   // Навешиваем флаг в зависимости от того, лайкнута МНОЙ карточка или нет
-  isLikedCard = button.classList.contains('card__like-button_is-active');
-  if(isLikedCard) {
+  const isLikedCard = button.classList.contains('card__like-button_is-active');
+  if(!isLikedCard) {
     // console.log('лАЙКАЕМ!');
     likeCard(item)
     .then((data) => {
       counter.textContent = data.likes.length;
+      button.classList.toggle('card__like-button_is-active');
       })
     .catch((err) => {
       console.log('Ошибка. Запрос не выполнен: ', err);
@@ -81,6 +80,7 @@ export function handleLikeCard(button, isLikedCard, counter, item) {
     deleteLikeCard(item)
     .then((data) => {
       counter.textContent = data.likes.length;
+      button.classList.toggle('card__like-button_is-active');
     })
     .catch((err) => {
       console.log('Ошибка. Запрос не выполнен: ', err);

@@ -88,7 +88,7 @@ export function toggleButtonState(inputList, buttonElement, validationConfig) {
 
 // Функция, которая очищает ошибки валидации формы и делает кнопку неактивной
 export function clearValidation(formElement, validationConfig) {
-  const inputElements = formElement.querySelectorAll(validationConfig.inputErrorClass);
+  const inputElements = formElement.querySelectorAll(validationConfig.Selector);
   inputElements.forEach((item) => {
     hideInputError(formElement, item, validationConfig);
   })

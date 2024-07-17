@@ -3,7 +3,7 @@ import {createCard} from '../components/cards.js'
 import {openModal, closeModal} from '../components/modal.js';
 import {enableValidation, showInputError, hideInputError, checkInputValidity, setEventListeners, hasInvalidInput, toggleButtonState, clearValidation} from '../components/validation.js';
 import {getUserData, getInitialCards, editProfile, addCard, likeCard, editProfileImage, deleteLikeCard} from '../components/api.js';
-import {handleLikeCard} from '../components/cards.js'
+import {handleLikeCard, isLikedCard} from '../components/cards.js'
 
 const modalImage = document.querySelector('.popup_type_image');
 const cardImage = document.querySelector('.popup_type_image .popup__content .popup__image');
@@ -15,7 +15,7 @@ const popupEditWindow = document.querySelector('.popup_type_edit');
 const profileAddButton = document.querySelector('.profile__add-button');
 const popupNewCard = document.querySelector('.popup_type_new-card');
 const popupsModal = document.querySelectorAll(".popup");
-const formElement = document.querySelector('.popup__form');
+const formElement = popupEditWindow.querySelector('.popup__form');
 const nameInput = document.querySelector('.popup__input_type_name');
 const jobInput = document.querySelector('.popup__input_type_description');
 const createCardPopup = document.querySelector('.popup_type_new-card');
@@ -30,6 +30,7 @@ const popupProfileImage = document.querySelector('.popup_type_edit-avatar');
 const profileImageUrlInput = document.querySelector('.popup_type_edit-avatar .popup__content .popup__form .popup__input_type_url');
 const editProfileImageFormElement = document.querySelector('.popup_type_edit-avatar .popup__content .popup__form');
 let userId;
+// let submitButton;
 
 // // Загрузка данных о пользователе с сервера
 // getUserData().then((data) => {
@@ -42,15 +43,12 @@ Promise.all([getUserData(), getInitialCards()])
 .then(([userData, cardsArr]) => {
   profileTitle.textContent = userData.name;
   profileDescription.textContent = userData.about;
+  userId = userData._id;
   profileImage.setAttribute('style', `background-image: url(${userData.avatar})`);
   cardsArr.forEach(function(item) {
-    userId = userData._id;
     const newCard = createCard(item, handleClickCard, handleLikeCard, userId);
 
     placesList.append(newCard);
-
-    const deleteButton = newCard.querySelector('.card__delete-button');
-    // userId = userData._id;
   })
 })
 .catch((err) => {
@@ -89,8 +87,9 @@ function handleFormEditProfileImage(evt) {
   evt.preventDefault();
   const item = {avatar: ''};
   item.avatar = profileImageUrlInput.value;
-  renderLoading(true);
-  const modalIsOpened = document.querySelector('.popup_is-opened');
+  const submitButton = evt.submitter;
+  renderLoading(true, submitButton);
+  // const modalIsOpened = document.querySelector('.popup_is-opened');
 
   editProfileImage(item)
   // .then((res) => console.log(res.avatar))
@@ -98,10 +97,10 @@ function handleFormEditProfileImage(evt) {
     profileImage.setAttribute('style', `background-image: url(${data.avatar})`)
   })
   .then(() => {
-    closeModal(modalIsOpened);
+    closeModal(popupProfileImage);
   })
   .finally(() => {
-    renderLoading(false);
+    renderLoading(false, submitButton);
   })
   .catch((err) => {
     console.log('Ошибка. Запрос не выполнен: ', err);
@@ -117,8 +116,9 @@ function handleFormSubmit(evt) {
   user.name = nameInput.value;
   user.about = jobInput.value;
 
-  renderLoading(true);
-  const modalIsOpened = document.querySelector('.popup_is-opened');
+  const submitButton = evt.submitter;
+  renderLoading(true, submitButton);
+  // const modalIsOpened = document.querySelector('.popup_is-opened');
   // Обновление данных профиля
   editProfile(user)
   .then(() => {
@@ -127,10 +127,10 @@ function handleFormSubmit(evt) {
     profileDescription.textContent = jobInput.value;
   })
   .then(() => {
-    closeModal(modalIsOpened);
+    closeModal(popupEditWindow);
   })
   .finally(() => {
-    renderLoading(false);
+    renderLoading(false,submitButton);
   })
   .catch((err) => {
     console.log('Ошибка. Запрос не выполнен: ', err);
@@ -144,17 +144,19 @@ function handleFormCreateCard(evt) {
   item.name = cardNameInput.value;
   item.link = cardUrlInput.value;
 
-  renderLoading(true);
-  const modalIsOpened = document.querySelector('.popup_is-opened');
-  const saveButton = modalIsOpened.querySelector('.popup__button');
+  const submitButton = evt.submitter;
+  renderLoading(true, submitButton);
+  // const modalIsOpened = document.querySelector('.popup_is-opened');
+  const saveButton = popupNewCard.querySelector('.popup__button');
   // Добавление новой карточки
   addCard(item)
   .then((data) => {
-    const newCard = createCard(data, handleClickCard, handleLikeCard);
+    const newCard = createCard(data, handleClickCard, handleLikeCard, userId);
     placesList.prepend(newCard);
   })
+  .then(() => console.log(userId))
   .then(() => {
-    closeModal(modalIsOpened);
+    closeModal(popupNewCard);
   })
   .then(() => {
     // Очистка инпутов формы карточки после закрытия модального окна
@@ -168,7 +170,7 @@ function handleFormCreateCard(evt) {
     saveButton.setAttribute('disabled', '');
   })
   .finally(() => {
-    renderLoading(false);
+    renderLoading(false, submitButton);
   })
   .catch((err) => {
     console.log('Ошибка. Запрос не выполнен: ', err);
@@ -176,12 +178,13 @@ function handleFormCreateCard(evt) {
 }
 
 // Функция, отображающая надпись "Сохранение..." на кнопке сохранения, пока идёт загрузка
-function renderLoading(isLoading) {
-  const popupSaveButton = document.querySelector('.popup__button');
+
+function renderLoading(isLoading, submitButton) {
+  // const popupSaveButton = document.querySelector('.popup__button');
   if (isLoading) {
-    popupSaveButton.textContent = 'Сохранение...';
+    submitButton.textContent = 'Сохранение...';
   } else {
-    popupSaveButton.textContent = 'Сохранить';
+    submitButton.textContent = 'Сохранить';
   }
 }
 
