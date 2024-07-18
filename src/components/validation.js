@@ -1,5 +1,3 @@
-import { validationConfig } from "../scripts/index";
-
 // Валидация форм
 
 //Функция отображения сообщения об ошибке
@@ -88,7 +86,7 @@ export function toggleButtonState(inputList, buttonElement, validationConfig) {
 
 // Функция, которая очищает ошибки валидации формы и делает кнопку неактивной
 export function clearValidation(formElement, validationConfig) {
-  const inputElements = formElement.querySelectorAll(validationConfig.Selector);
+  const inputElements = formElement.querySelectorAll(validationConfig.inputSelector);
   inputElements.forEach((item) => {
     hideInputError(formElement, item, validationConfig);
   })
